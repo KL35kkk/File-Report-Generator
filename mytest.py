@@ -1,8 +1,6 @@
 import os
 import xlwt
 
-# -*- coding:utf-8 -*-
-
 #写个配置文件，通过它获取目录
 def get_dir():
     try:
