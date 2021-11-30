@@ -1,5 +1,8 @@
 import os
 import xlwt
+import xlrd
+
+# old_wb = xlrd.open_workbook("file.xlsx")
 
 #写个配置文件，通过它获取目录
 def get_dir():
@@ -17,6 +20,14 @@ dir_col=0
 file_col=1
 row_init=0
 
+#创建一个样式----------------------------
+style1 = xlwt.XFStyle()
+pattern = xlwt.Pattern()
+pattern.pattern = xlwt.Pattern.SOLID_PATTERN
+pattern.pattern_fore_colour = xlwt.Style.colour_map['green'] #设置单元格背景色为绿色
+style1.pattern = pattern
+#-----------------------------------------
+
 #从配置获取目录名
 dir=get_dir()
 dir="./ocean_doc" #建议使用配置文件获取目录
@@ -32,7 +43,7 @@ for parent, dir_names, file_names in os.walk(dir):
             row_init=row_init-1
         # sh.write(row_init, dir_col, os.path.join(parent, file_name))
         if file_name != ".gitkeep" and not filled.__contains__(parent):
-            sh.write(row_init, file_col, "已有文档")
+            sh.write(row_init, file_col, "已有文档", style=style1)
             filled.append(parent)
         row_init = row_init+1
 
