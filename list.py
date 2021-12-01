@@ -47,5 +47,5 @@ for parent, dir_names, file_names in os.walk(dir):
             filled.append(parent)
         row_init = row_init+1
 
-wb.save("doc汇总结果.xls")
+wb.save("文件汇总结果.xls")
 
