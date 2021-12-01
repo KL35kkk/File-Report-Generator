@@ -1,4 +1,3 @@
-
 '''
 @author: Kevin
 @contact: 
@@ -12,7 +11,7 @@ import xlrd
 from xlutils.copy import copy
 
 
-rb = xlrd.open_workbook('old_file.xls')
+rb = xlrd.open_workbook('文件汇总结果.xls')
 wb = copy(rb)
 sh = wb.get_sheet(0)
 

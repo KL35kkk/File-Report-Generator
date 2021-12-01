@@ -13,9 +13,9 @@ import xlwt
 import xlrd
 
 # 此部分需根据产品线手动添加
-product_list = ["00.文档模板", "01.深海大数据平台", "02.基础平台", "03.门户", "04.资源管理平台", "05.数据集成平台", "06-1.作业管理平台", "06.数据开发平台", "07.数据治理平台", "08.实时数据集成", "09.数据可视化平台", "10.标签画像平台", "11.实时计算平台", "12.变量中心服务", "13.数据服务平台", "14.指标管理平台", "15.外采管理平台", "16.机器学习平台", "17.图分析平台"]
+product_list = ["00.文档模板", "01.深海大数据平台", "02.基础平台", "03.门户", "04.资源管理平台", "05.数据集成平台", "06-1.作业管理平台", "06.数据开发平台", "07.数据治理平台", "08.实时数据集成", "09.数据可视化平台-BI", "09.数据可视化平台-A+", "10.标签画像平台", "11.实时计算平台", "12.变量中心服务", "13.数据服务平台", "14.指标管理平台", "15.外采管理平台", "16.机器学习平台", "17.图分析平台"]
 doc_list = ["01产品文档", "02技术文档", "03测试文档", "04部署运维手册"]
-doc_detail_list = ["01-01需求说明书", "01-02产品宣传", "01-03产品白皮书", "01-04产品原型", "01-05用户操作手册", "01-06产品功能清单", "01-07里程碑清单", "02-01代码库清单", "02-02总体设计", "02-03概要设计", "02-04详细设计", "02-05数据库设计", "02-06产品依赖说明", "03-01测试计划", "03-02测试用例", "03-03测试报告", "04-01-01安装操作说明", "04-01-02测试资产资源台账", "04-01-03安装验证清单", "04-02部署初始化脚本", "04-03产品升级说明", "04-04系统运维手册", "04-05应急处置手册"]
+doc_detail_list = ["01.需求说明书", "02.产品宣传", "03.产品白皮书", "04.产品原型", "05.用户操作手册", "06.产品功能清单", "07.里程碑清单", "01.代码库清单", "02.总体设计", "03.概要设计", "04.详细设计", "05.数据库设计", "06.产品依赖说明", "01.测试计划", "02.测试用例", "03.测试报告", "01.安装操作说明", "02.测试&生产资源台账", "03.安装验证清单", "02.部署初始化脚本", "03.产品升级说明", "04.系统运维手册", "05.应急处置手册"]
 segment_arr = [7, 13, 16, 23] # doc名称分界index
 version_list = ["V", "V1.0", "V2.0", "V2.1"]
 # ----------------------------------------------------
@@ -89,27 +89,59 @@ def get_dir():
         print("文件格式有误,或者文件名不对----"+e)
 
 file_col=1
-row_init=3 # 对应大目录
-col_init=0 # 对应小目录
+row_init=2 # 对应大目录
+col_init=1 # 对应小目录
 
 #从配置获取目录名
 dir=get_dir()
 dir="./ocean_doc" #建议使用配置文件获取目录
 
 prev_dir = ""
+prev_row_num = 0
 for parent, dir_names, file_names in os.walk(dir):
     for file_name in file_names:
         if file_name == ".gitkeep" or file_name == ".gitignore" or file_name == "README.md":
             continue
+
         parent_split = parent.split('/')
-        if parent_split[2] != prev_dir:
+
+        #--------------------------
+        if parent_split[2] == "09.数据可视化平台": # 深海特殊标记
+            if parent_split[3] == "01.AgileBI":
+                parent_split[2] = "09.数据可视化平台-BI"
+            else:
+                parent_split[2] = "09.数据可视化平台-A+"
+        #--------------------------
+
+        if parent_split[2] != prev_dir: # （row index）
             prev_dir = parent_split[2]
-            row_init = row_init+1
+            row_num = parent_split[2][0:2]
+            row_num = (int)(row_num)
+            if prev_row_num == row_num:
+                row_init = row_init + 1
+            else:
+                row_init = row_init + (row_num - prev_row_num)
+            prev_row_num = row_num
+                
         
+        if parent_split[3] not in version_list:
+            if parent_split[3] == "XX.其他文档":
+                continue
+            elif parent_split[4] in version_list:
+                ver = version_list.index(parent_split[4]) * len(doc_detail_list)
+            else:
+                ver = 0
+        else:
+            ver = version_list.index(parent_split[3]) * len(doc_detail_list)
         
+        doc_type = doc_detail_list.index(parent_split[len(parent_split)-1])
+
+
+        sh.write(row_init, ver+doc_type+1, "", style1)
 
         
         print(parent_split)
+
 
 wb.save("doc汇总结果.xls")
 
