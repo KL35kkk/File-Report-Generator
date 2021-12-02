@@ -1,12 +1,22 @@
 # py-excel
 Python project to update excel based on doc directory
 
+## Requirements
+- Python
+- pip
+
+### Install Requirements
+pip install -r requirements.txt
+
+### Running
+python3 new_ocean.py
+
 ## Doc Requirement
 For saving standardized product documentation
 
 ### Doc Name
 
-Product-Product Number-Product Name(Simplified Chinese)-Doc Type-Version
+Product-Product Number-Product Name(Simplified Chinese)-Doc Type-Version-
 
 > ex1：深海-05-数据集成平台-产品白皮书-V1.0.docx
 >

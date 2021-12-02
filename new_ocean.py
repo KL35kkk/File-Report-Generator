@@ -23,6 +23,12 @@ version_list = ["V", "V1.0", "V2.0", "V2.1"]
 wb = xlwt.Workbook(encoding = 'utf-8')
 sh = wb.add_sheet('ocean_doc', cell_overwrite_ok=True)
 
+# TODO(Kevin): 通过os.walk或os.listdir获取每一层的内容并进行筛选
+#-------------------------------------------------------
+
+
+
+
 #创建四个样式----------------------------
 style1 = xlwt.XFStyle()
 pattern1 = xlwt.Pattern()
@@ -95,9 +101,6 @@ col_init=1 # 对应小目录
 #从配置获取目录名
 dir=get_dir()
 dir="./ocean_doc" #建议使用配置文件获取目录
-
-# TODO(Kevin): 通过os.walk或os.listdir获取每一层的内容并进行筛选
-#-------------------------------------------------------
 
 prev_dir = ""
 prev_row_num = 0
