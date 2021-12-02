@@ -27,7 +27,7 @@ example_prod = "00.文档模板"
 wb = xlwt.Workbook(encoding = 'utf-8')
 sh = wb.add_sheet('ocean_doc', cell_overwrite_ok=True)
 
-# TODO(Kevin): 通过os.listdir获取每一层的内容并进行筛选
+# 通过os.listdir获取每一层的内容并进行筛选
 #-------------------------------------------------------
 path = "./ocean_doc"
 # 1.登记文档名称 | 2.文档细节名称 | 3.分隔文档类型
@@ -158,14 +158,6 @@ for parent, dir_names, file_names in os.walk(dir):
         
         copy = parent.replace("\\\\", "/")
         parent_split = parent.split('/')
-
-        #--------------------------
-        if parent_split[2] == "09.数据可视化平台": # 深海特殊标记
-            if parent_split[3] == "01.AgileBI":
-                parent_split[2] = "09.数据可视化平台-BI"
-            else:
-                parent_split[2] = "09.数据可视化平台-A+"
-        #--------------------------
 
         if parent_split[2] != prev_dir: # （row index）
             prev_dir = parent_split[2]
