@@ -99,6 +99,8 @@ dir="./ocean_doc" #建议使用配置文件获取目录
 prev_dir = ""
 prev_row_num = 0
 for parent, dir_names, file_names in os.walk(dir):
+    file_names = [f for f in file_names if not f[0] == '.']
+    dir_names[:] = [d for d in dir_names if not d[0] == '.']
     for file_name in file_names:
         if file_name == ".gitkeep" or file_name == ".gitignore" or file_name == "README.md":
             continue

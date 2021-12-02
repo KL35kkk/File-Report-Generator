@@ -2,13 +2,14 @@
 Python project to update excel based on doc directory
 
 ## Requirements
-- Python
+- Python 3.8.x
 - pip
 
 ### Install Requirements
 pip install -r requirements.txt
 
 ### Running
+cd venv & source ./bin/activate
 python3 new_ocean.py
 
 ## Doc Requirement

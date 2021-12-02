@@ -9,6 +9,7 @@
 '''
 
 import os
+import re
 import xlwt
 import xlrd
 
@@ -18,6 +19,9 @@ doc_list = ["01产品文档", "02技术文档", "03测试文档", "04部署运�
 doc_detail_list = ["01.需求说明书", "02.产品宣传", "03.产品白皮书", "04.产品原型", "05.用户操作手册", "06.产品功能清单", "07.里程碑清单", "01.代码库清单", "02.总体设计", "03.概要设计", "04.详细设计", "05.数据库设计", "06.产品依赖说明", "01.测试计划", "02.测试用例", "03.测试报告", "01.安装操作说明", "02.测试&生产资源台账", "03.安装验证清单", "02.部署初始化脚本", "03.产品升级说明", "04.系统运维手册", "05.应急处置手册"]
 segment_arr = [7, 13, 16, 23] # doc名称分界index
 version_list = ["V", "V1.0", "V2.0", "V2.1"]
+ignore_files = [".git", ".gitkeep", ".gitignore", "README.md"]
+ignore_docs = ["XX.其他文档"]
+example_prod = "00.文档模板"
 # ----------------------------------------------------
 
 wb = xlwt.Workbook(encoding = 'utf-8')
@@ -25,6 +29,7 @@ sh = wb.add_sheet('ocean_doc', cell_overwrite_ok=True)
 
 # TODO(Kevin): 通过os.walk或os.listdir获取每一层的内容并进行筛选
 #-------------------------------------------------------
+
 
 
 
@@ -85,30 +90,23 @@ for i in range (0, len(version_list)):
 
 #---------------------------开始标记---------------------------------
 
-#写个配置文件，通过它获取目录
-def get_dir():
-    try:
-        with open('dir.txt', 'r') as f :
-            print(f.readline())
-            return f.readline()
-    except Exception as e:
-        print("文件格式有误,或者文件名不对----"+e)
-
 file_col=1
 row_init=2 # 对应大目录
 col_init=1 # 对应小目录
 
 #从配置获取目录名
-dir=get_dir()
-dir="./ocean_doc" #建议使用配置文件获取目录
+dir="./ocean_doc"
 
 prev_dir = ""
 prev_row_num = 0
 for parent, dir_names, file_names in os.walk(dir):
+    file_names = [f for f in file_names if not f[0] == '.'] # 过滤隐藏文件
+    dir_names[:] = [d for d in dir_names if not d[0] == '.'] # 过滤隐藏目录
     for file_name in file_names:
-        if file_name == ".gitkeep" or file_name == ".gitignore" or file_name == "README.md":
+        if file_name in ignore_files: # 过滤额外文件
             continue
-
+        
+        copy = parent.replace("\\\\", "/")
         parent_split = parent.split('/')
 
         #--------------------------
@@ -131,7 +129,7 @@ for parent, dir_names, file_names in os.walk(dir):
                 
         
         if parent_split[3] not in version_list:
-            if parent_split[3] == "XX.其他文档":
+            if parent_split[3] in ignore_docs:
                 continue
             elif parent_split[4] in version_list:
                 ver = version_list.index(parent_split[4]) * len(doc_detail_list)
@@ -151,3 +149,11 @@ for parent, dir_names, file_names in os.walk(dir):
 
 wb.save("doc汇总结果.xls")
 
+#写个配置文件，通过它获取目录
+def get_dir():
+    try:
+        with open('dir.txt', 'r') as f :
+            print(f.readline())
+            return f.readline()
+    except Exception as e:
+        print("文件格式有误,或者文件名不对----"+e)
