@@ -10,6 +10,7 @@ pip install -r requirements.txt
 
 ### Running
 cd venv & source ./bin/activate
+
 python3 new_ocean.py
 
 ## Doc Requirement
