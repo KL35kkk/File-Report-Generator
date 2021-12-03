@@ -11,9 +11,9 @@ import xlrd
 from xlutils.copy import copy
 
 
-rb = xlrd.open_workbook('文件汇总结果.xls')
+rb = xlrd.open_workbook('file.xls')
 wb = copy(rb)
 sh = wb.get_sheet(0)
 
-wb.save("doc汇总结果.xls")
+wb.save("file_test.xls")
 

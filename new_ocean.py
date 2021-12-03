@@ -1,11 +1,20 @@
-
 '''
-@author: Kevin
+@author: lixiaoxuan18(Kevin Li)
 @contact: 
 @software: PyCharm
-@file: ocean_app.py
+@file: new_ocean.py
 @time: 2021/12/1
 @desc:
+    new_ocean.py: 根据文档目录标注单元格并生成excel
+    list.py：根据文档目录列出所有文档路径并表明当前路径是否有文档
+    read_file_test: 检测当前模板是否可用脚本处理
+
+    使用说明
+        1. 安装Python3.8.X (python3 --version)
+        2. 安装pip (pip --version)
+        3. pip install -r requirements.txt
+        4. python3 new_ocean.py
+
 '''
 
 import os
@@ -13,7 +22,6 @@ import re
 import xlwt
 import xlrd
 
-# 此部分需根据产品线手动添加
 product_list = []
 doc_list = []
 doc_detail_list = []
@@ -81,7 +89,7 @@ for dir1 in dirs:
                 if inner_next_dir not in version_list:
                     version_list.append(inner_next_dir)
 version_list = sorted(version_list)
-
+print("---------------已扫描文档结构并记录---------------")
 
 
 #创建四个样式----------------------------
@@ -102,6 +110,15 @@ pattern3 = xlwt.Pattern()
 pattern3.pattern = xlwt.Pattern.SOLID_PATTERN
 pattern3.pattern_fore_colour = xlwt.Style.colour_map['yellow'] #设置单元格背景色为黄色 - 格式错误（后期补充，前期先为已有文档）
 style3.pattern = pattern3
+
+borders = xlwt.Borders()
+borders.left = 2
+borders.right = 2
+borders.top = 2
+borders.bottom = 2
+style1.borders = borders
+style2.borders = borders
+style3.borders = borders
 #-----------------------------------------
 
 #编辑文档第一列
@@ -137,7 +154,7 @@ for i in range (0, len(version_list)):
 for i in range (0, len(version_list)):
     n = i * len(doc_detail_list)
     sh.write_merge(2, 2, n + 1, n + len(doc_detail_list), version_list[i], xlwt.easyxf('align: horiz center; pattern: pattern solid, fore_colour 0x16; borders: left thick, right thick, top thick, bottom thick;'))
-
+print("---------------文档结构已搭建完成！---------------")
 #---------------------------开始标记---------------------------------
 
 file_col=1
@@ -158,6 +175,9 @@ for parent, dir_names, file_names in os.walk(dir):
         
         copy = parent.replace("\\\\", "/")
         parent_split = parent.split('/')
+
+        if parent_split[2] not in product_list:
+            parent_split[2] = parent_split[2] + parent_split[3].split(".")[1]
 
         if parent_split[2] != prev_dir: # （row index）
             prev_dir = parent_split[2]
@@ -186,10 +206,11 @@ for parent, dir_names, file_names in os.walk(dir):
         sh.write(row_init, ver+doc_type+1, "", style1)
 
         
-        print(parent_split)
+        # print(parent_split)
 
-
-wb.save("doc汇总结果.xls")
+doc_name = "doc汇总结果.xls"
+wb.save(doc_name)
+print("---------------已成功输出excel，文件名为：" + doc_name + "---------------")
 
 #写个配置文件，通过它获取目录
 def get_dir():
