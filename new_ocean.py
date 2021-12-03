@@ -91,6 +91,8 @@ version_list = sorted(version_list)
 print("---------------已扫描文档结构并记录---------------")
 
 # 创建四个样式----------------------------
+styles = []
+styles_desc = ["已有文档", "缺失文档", "格式错误"]
 style1 = xlwt.XFStyle()
 pattern1 = xlwt.Pattern()
 pattern1.pattern = xlwt.Pattern.SOLID_PATTERN
@@ -117,6 +119,9 @@ borders.bottom = 2
 style1.borders = borders
 style2.borders = borders
 style3.borders = borders
+styles.append(style1)
+styles.append(style2)
+styles.append(style3)
 # -----------------------------------------
 
 # 编辑文档第一列
@@ -133,6 +138,13 @@ prod_style.pattern = pattern
 sh.col(0).width = 256 * 20
 for i in range(0, len(product_list)):
     sh.write(i + 3, 0, product_list[i], style=prod_style)
+
+mark_cell_row = len(product_list) + 5
+mark_cell_column = 3
+for i in range(0, len(styles)):
+    sh.write(mark_cell_row, mark_cell_column, "", styles[i])
+    sh.write(mark_cell_row, mark_cell_column + 1, styles_desc[i])
+    mark_cell_column = mark_cell_column + 5
 
 # 编辑文档第一行
 for i in range(0, len(version_list)):
