@@ -16,6 +16,10 @@ python3 new_ocean.py
 ## Doc Requirement
 For saving standardized product documentation
 
+### Directory Structure
+
+Product -> Version -> Doc Type -> Specific Doc -> Files
+
 ### Doc Name
 
 Product-Product Number-Product Name(Simplified Chinese)-Doc Type-Version-
