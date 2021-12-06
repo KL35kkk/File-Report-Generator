@@ -5,6 +5,8 @@ Python project to update excel based on doc directory
 - Python 3.8.x
 - pip
 
+## Usage
+
 ### Install Requirements
 pip install -r requirements.txt
 
