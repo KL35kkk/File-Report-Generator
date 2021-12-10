@@ -36,6 +36,7 @@ version_list = ["V"]  # "V"用于文档模板一栏
 ignore_files = [".git", ".gitkeep", ".gitignore", "README.md"]
 ignore_docs = ["XX.其他文档"]
 example_prod = "00.文档模板"
+each_version_dict = {example_prod: ["V"]}
 required_doc = ["03.产品白皮书", "05.用户操作手册", "01.代码库清单", "03.概要设计", "05.数据库设计", "01.安装操作说明", "02.部署初始化脚本"]
 # ----------------------------------------------------
 
@@ -80,6 +81,9 @@ for dir1 in dirs:
     next_path = path + "/" + dir1
     next_dirs = os.listdir(next_path)
 
+    if dir1 != example_prod:
+        each_version_dict.update({dir1: next_dirs})
+
     prod_ver_count = 0
     curr_index = 0
     for dir2 in next_dirs:
@@ -90,11 +94,13 @@ for dir1 in dirs:
             if prod_ver_count == 0:
                 curr_index = product_list.index(dir1)
                 product_list.remove(dir1)
+                del each_version_dict[dir1]
             product_list.insert((curr_index + prod_ver_count), dir1.split('.')[0] + "." + dir2.split('.')[1])
             prod_ver_count = prod_ver_count + 1
             for inner_next_dir in inner_next_dirs:
                 if inner_next_dir not in version_list:
                     version_list.append(inner_next_dir)
+            each_version_dict.update({(dir1.split('.')[0] + "." + dir2.split('.')[1]): inner_next_dirs})
 version_list = sorted(version_list)
 print("---------------已扫描文档结构并记录---------------")
 
@@ -180,13 +186,25 @@ for i in range(0, len(version_list)):
 print("---------------文档结构已搭建完成！---------------")
 # ---------------------------开始标记---------------------------------
 
+# 标记目前强制需要文档
+required_row_init = 3
+for i in range(0, len(product_list)):
+    for j in range(0, len(required_doc)):
+        required_col_detail_index = doc_detail_list.index(required_doc[j])
+        required_each_versions = each_version_dict.get(product_list[i])
+        for version in required_each_versions:
+            version_index = version_list.index(version)
+            sh.write(required_row_init, version_index * len(doc_detail_list) + required_col_detail_index + 1, "", style2)
+    required_row_init += 1
+
+
+# 从配置获取目录名
+dir = "./ocean_doc"
+
 
 file_col = 1
 row_init = 2  # 对应大目录
 col_init = 1  # 对应小目录
-
-# 从配置获取目录名
-dir = "./ocean_doc"
 
 prev_dir = ""
 prev_row_num = 0
@@ -246,6 +264,7 @@ for parent, dir_names, file_names in os.walk(dir):
         else:
             sh.write(row_init, ver + doc_type + 1, "", style3) # 格式有问题
 
+        # print(parent_split)
 
 doc_name = "doc汇总结果.xls"
 wb.save(doc_name)
