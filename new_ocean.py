@@ -18,10 +18,17 @@
 """
 
 import os
+import re
+from utils import overlapElement
+from functools import reduce
 import xlwt
 import xlrd
 
+#-----------------------------------------------------
+
+platform_name = ["深海", "ocean"]
 product_list = []
+
 doc_list = []
 doc_detail_list = []
 segment_arr = []  # doc名称分界index
@@ -29,6 +36,7 @@ version_list = ["V"]  # "V"用于文档模板一栏
 ignore_files = [".git", ".gitkeep", ".gitignore", "README.md"]
 ignore_docs = ["XX.其他文档"]
 example_prod = "00.文档模板"
+required_doc = ["03.产品白皮书", "05.用户操作手册", "01.代码库清单", "03.概要设计", "05.数据库设计", "01.安装操作说明", "02.部署初始化脚本"]
 # ----------------------------------------------------
 
 wb = xlwt.Workbook(encoding='utf-8')
@@ -82,7 +90,7 @@ for dir1 in dirs:
             if prod_ver_count == 0:
                 curr_index = product_list.index(dir1)
                 product_list.remove(dir1)
-            product_list.insert((curr_index + prod_ver_count), dir1 + dir2.split('.')[1])
+            product_list.insert((curr_index + prod_ver_count), dir1.split('.')[0] + "." + dir2.split('.')[1])
             prod_ver_count = prod_ver_count + 1
             for inner_next_dir in inner_next_dirs:
                 if inner_next_dir not in version_list:
@@ -172,6 +180,7 @@ for i in range(0, len(version_list)):
 print("---------------文档结构已搭建完成！---------------")
 # ---------------------------开始标记---------------------------------
 
+
 file_col = 1
 row_init = 2  # 对应大目录
 col_init = 1  # 对应小目录
@@ -191,7 +200,7 @@ for parent, dir_names, file_names in os.walk(dir):
         parent_split = parent.replace("\\", "/").split('/')
 
         if parent_split[2] not in product_list:
-            parent_split[2] = parent_split[2] + parent_split[3].split(".")[1]
+            parent_split[2] = parent_split[2].split(".")[0] + "." + parent_split[3].split(".")[1]
 
         if parent_split[2] != prev_dir:  # （row index）
             prev_dir = parent_split[2]
@@ -215,9 +224,28 @@ for parent, dir_names, file_names in os.walk(dir):
 
         doc_type = doc_detail_list.index(parent_split[len(parent_split) - 1])
 
-        sh.write(row_init, ver + doc_type + 1, "", style1)
+        legal_check = True
+        legal_doc_name = ""
+        separate_file_name = file_name[0:file_name.rfind(".")]
+        separate_extension = f'.{file_name.split(".")[-1]}'
+        if separate_extension != ".sql":
+            doc_name_chinese = parent_split[2].split('.')
+            doc_detail_chinese = parent_split[len(parent_split) - 1].split(".")
+            curr_version_chinese = overlapElement(parent_split, version_list)
+            if len(curr_version_chinese) == 0:
+                curr_version_chinese = list(version_list[0])
+            legal_doc_name = platform_name[0] + "-" + doc_name_chinese[0] + "-" + doc_name_chinese[1] + "-" + doc_detail_chinese[1] + "-" + curr_version_chinese[0]
+            if legal_doc_name.lower() != separate_file_name.lower():
+                legal_check = False
+        else:
+            # TODO: 进一步检查初始化脚本文件
+            legal_doc_name = platform_name[1] + "-" + ""
 
-        # print(parent_split)
+        if legal_check or parent_split[2] == example_prod:
+            sh.write(row_init, ver + doc_type + 1, "", style1) # 文档正常存在
+        else:
+            sh.write(row_init, ver + doc_type + 1, "", style3) # 格式有问题
+
 
 doc_name = "doc汇总结果.xls"
 wb.save(doc_name)

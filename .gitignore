@@ -131,3 +131,6 @@ dmypy.json
 # VScode
 .vscode/*
 .idea/*
+
+# doc_file
+ocean_doc/
