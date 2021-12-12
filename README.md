@@ -1,5 +1,5 @@
 # py-excel
-Python project to update excel based on doc directory
+Python project to generate .xls/.csv based on product doc directory
 
 ## Requirements
 - Python 3.8.x
