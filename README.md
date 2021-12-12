@@ -9,6 +9,7 @@ Python project to generate .xls/.csv based on product doc directory
 
 ### Install Requirements
 git clone https://github.com/KL35kkk/py-excel/
+
 pip install -r requirements.txt
 
 ### Running
