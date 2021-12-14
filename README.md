@@ -26,7 +26,7 @@ Product -> Version -> Doc Type -> Specific Doc -> Files
 
 ### Doc Name
 
-Product-Product Number-Product Name(Simplified Chinese)-Doc Type-Version-
+Product-Product Number-Product Name-Doc Type-Version-Suffix (separated by hyphen)
 
 > ex1：OCEAN-05-DATA_INTEGRATION_PLATFORM-PRODUCT_PROTOTYPE-V1.0.docx
 >
