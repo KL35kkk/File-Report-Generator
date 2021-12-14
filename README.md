@@ -22,7 +22,7 @@ For saving standardized product documentation
 
 ### Directory Structure
 
-Product -> Version -> Doc Type -> Specific Doc -> Files
+Product -> (Sub-Product) -> Version -> Doc Type -> Specific Doc -> Files
 
 ### Doc Name
 
