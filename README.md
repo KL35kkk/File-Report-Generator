@@ -8,9 +8,11 @@ Python project to generate .xls/.csv based on product doc directory
 ## Usage
 
 ### Install Requirements
-git clone https://github.com/KL35kkk/py-excel/
+1. git clone https://github.com/KL35kkk/py-excel/
 
-pip install -r requirements.txt
+2. pip install -r requirements.txt
+
+3. put doc directory inside py-excel folder
 
 ### Running
 cd venv & source ./bin/activate
