@@ -266,7 +266,7 @@ for parent, dir_names, file_names in os.walk(dir):
 
         # print(parent_split)
 
-doc_name = "doc汇总结果.xls"
+doc_name = "doc_result_chart.xls"
 wb.save(doc_name)
 print("---------------已成功输出excel，文件名为：" + doc_name + "---------------")
 
