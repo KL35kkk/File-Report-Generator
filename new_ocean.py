@@ -90,7 +90,7 @@ for dir1 in dirs:
         inner_next_dirs = os.listdir(next_path + "/" + dir2)
         if dir2[0] == 'V' and dir2 not in version_list:
             version_list.append(dir2)
-        elif inner_next_dirs[0][0] == 'V':  # 如果version在下一层
+        elif inner_next_dirs[0][0].upper() == 'V':  # 如果version在下一层
             if prod_ver_count == 0:
                 curr_index = product_list.index(dir1)
                 product_list.remove(dir1)
