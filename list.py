@@ -1,3 +1,21 @@
+"""
+@author: lixiaoxuan18(Kevin Li)
+@contact:
+@software: PyCharm
+@file: list.py
+@time: 2021/11/30
+@desc:
+    new_ocean.py: 根据文档目录标注单元格并生成excel
+    list.py：根据文档目录列出所有文档路径并表明当前路径是否有文档
+    read_file_test: 检测表格模板是否可用脚本处理
+    使用说明
+        1. 安装Python3.8.X (python3 --version)
+        2. 安装pip (pip --version)
+        3. pip install -r requirements.txt
+        4. python3 new_ocean.py
+"""
+
+
 import os
 import xlwt
 import xlrd
