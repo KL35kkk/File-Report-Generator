@@ -5,6 +5,8 @@
 @file: read_file_test.py
 @time: 2021/12/1
 @desc:
+    read_file_test: 检测表格模板是否可用脚本处理
+
 '''
 
 import xlrd

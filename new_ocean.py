@@ -8,6 +8,7 @@
     new_ocean.py: 根据文档目录标注单元格并生成excel
     list.py：根据文档目录列出所有文档路径并表明当前路径是否有文档
     read_file_test: 检测表格模板是否可用脚本处理
+    filter_result.py: 根据标记后的excel寻找需要的产品文档
 
     使用说明
         1. 安装Python3.8.X (python3 --version)
