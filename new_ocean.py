@@ -6,6 +6,7 @@
 @time: 2021/12/1
 @desc:
     new_ocean.py: 根据文档目录标注单元格并生成excel
+    doc_var.py: 用于存放脚本筛选所需信息
     list.py：根据文档目录列出所有文档路径并表明当前路径是否有文档
     read_file_test: 检测表格模板是否可用脚本处理
     filter_result.py: 根据标记后的excel寻找需要的产品文档
@@ -21,26 +22,27 @@
 import os
 import re
 from utils import overlapElement
+from mark_division import get_division_list
 from functools import reduce
 import xlwt
 import xlrd
 
 #-----------------------------------------------------
+from doc_var import path
+from doc_var import group_division
+from doc_var import platform_name
+from doc_var import ignore_files
+from doc_var import ignore_docs
+from doc_var import example_prod # 暂时作为模板文档名
+from doc_var import required_doc
 
-platform_name = ["深海", "ocean"]
 product_list = []
 
 doc_list = []
 doc_detail_list = []
 segment_arr = []  # doc名称分界index
 version_list = ["V"]  # "V"用于文档模板一栏
-ignore_files = [".git", ".gitkeep", ".gitignore", "README.md"]
-ignore_docs = ["XX.其他文档"]
-example_prod = input("请输入文档模板名称（请仔细核对）：")
-example_prod = "00.文档模板" # 暂时作为模板文档名
-each_version_dict = {example_prod: ["V"]}
-required_doc = input("请输入必须标注的文件（请以文件夹名为准，并以空格隔开）：").split(" ")
-required_doc = ["03.产品白皮书", "05.用户操作手册", "01.代码库清单", "03.概要设计", "05.数据库设计", "01.安装操作说明", "02.部署初始化脚本"]
+each_version_dict = {example_prod: ["V"]} # 标记每个产品下的对应版本，用于排查必需文档
 # ----------------------------------------------------
 
 wb = xlwt.Workbook(encoding='utf-8')
@@ -48,7 +50,7 @@ sh = wb.add_sheet('ocean_doc', cell_overwrite_ok=True)
 
 # 通过os.listdir获取每一层的内容并进行筛选
 # -------------------------------------------------------
-path = "./ocean_doc"
+
 # 1.登记文档名称 | 2.文档细节名称 | 3.分隔文档类型
 # (通过00.文档模板获取)
 example_path = path + "/" + example_prod
@@ -156,13 +158,6 @@ sh.col(0).width = 256 * 20
 for i in range(0, len(product_list)):
     sh.write(i + 3, 0, product_list[i], style=prod_style)
 
-mark_cell_row = len(product_list) + 5
-mark_cell_column = 3
-for i in range(0, len(styles)):
-    sh.write(mark_cell_row, mark_cell_column, "", styles[i])
-    sh.write(mark_cell_row, mark_cell_column + 1, styles_desc[i])
-    mark_cell_column = mark_cell_column + 5
-
 # 编辑文档第一行
 for i in range(0, len(version_list)):
     for j in range(0, len(doc_detail_list)):
@@ -186,6 +181,22 @@ for i in range(0, len(version_list)):
     n = i * len(doc_detail_list)
     sh.write_merge(2, 2, n + 1, n + len(doc_detail_list), version_list[i], xlwt.easyxf(
         'align: horiz center; pattern: pattern solid, fore_colour 0x16; borders: left thick, right thick, top thick, bottom thick;'))
+
+mark_cell_row = len(product_list) + 5
+mark_cell_column = 3
+overall_res = get_division_list(path)
+for i in range(0, len(overall_res)):
+    sh.write(mark_cell_row, mark_cell_column, group_division[i] + ":")
+    sh.write(mark_cell_row, mark_cell_column + 2, overall_res[i])
+    mark_cell_column = mark_cell_column + 5
+
+mark_cell_row = len(product_list) + 8
+mark_cell_column = 3
+for i in range(0, len(styles)):
+    sh.write(mark_cell_row, mark_cell_column, "", styles[i])
+    sh.write(mark_cell_row, mark_cell_column + 1, styles_desc[i])
+    mark_cell_column = mark_cell_column + 5
+
 print("---------------文档结构已搭建完成！---------------")
 # ---------------------------开始标记---------------------------------
 

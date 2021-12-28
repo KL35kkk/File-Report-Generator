@@ -5,7 +5,7 @@
 @file: filter_result.py
 @time: 2021/12/24
 @desc:
-    filter_result.py: 根据标记后的excel寻找需要的产品文档
+    filter_result.py: 根据id或名称在excel寻找需要的数据
 
 """
 
