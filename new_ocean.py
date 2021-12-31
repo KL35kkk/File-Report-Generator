@@ -22,6 +22,7 @@
 import os
 import re
 from utils import overlapElement
+from utils import legal_name_check
 from mark_division import get_division_list
 from functools import reduce
 import xlwt
@@ -43,6 +44,7 @@ doc_detail_list = []
 segment_arr = []  # doc名称分界index
 version_list = ["V"]  # "V"用于文档模板一栏
 each_version_dict = {example_prod: ["V"]} # 标记每个产品下的对应版本，用于排查必需文档
+doc_stats = [[], [], []] # 用于统计各组文档完成情况
 # ----------------------------------------------------
 
 wb = xlwt.Workbook(encoding='utf-8')
@@ -184,18 +186,18 @@ for i in range(0, len(version_list)):
 
 mark_cell_row = len(product_list) + 5
 mark_cell_column = 3
-overall_res = get_division_list(path)
-for i in range(0, len(overall_res)):
-    sh.write(mark_cell_row, mark_cell_column, group_division[i] + ":")
-    sh.write(mark_cell_row, mark_cell_column + 2, overall_res[i])
-    mark_cell_column = mark_cell_column + 5
-
-mark_cell_row = len(product_list) + 8
-mark_cell_column = 3
 for i in range(0, len(styles)):
     sh.write(mark_cell_row, mark_cell_column, "", styles[i])
     sh.write(mark_cell_row, mark_cell_column + 1, styles_desc[i])
-    mark_cell_column = mark_cell_column + 5
+    mark_cell_row = mark_cell_row + 2
+
+# mark_cell_row = len(product_list) + 5
+# mark_cell_column = 8
+# overall_res = get_division_list(path)
+# for i in range(0, len(overall_res)):
+#     sh.write(mark_cell_row, mark_cell_column, group_division[i] + ":")
+#     sh.write(mark_cell_row, mark_cell_column + 2, overall_res[i])
+#     mark_cell_column = mark_cell_column + 5
 
 print("---------------文档结构已搭建完成！---------------")
 # ---------------------------开始标记---------------------------------
@@ -261,14 +263,7 @@ for parent, dir_names, file_names in os.walk(dir):
         separate_file_name = file_name[0:file_name.rfind(".")]
         separate_extension = f'.{file_name.split(".")[-1]}'
         if separate_extension != ".sql":
-            doc_name_chinese = parent_split[2].split('.')
-            doc_detail_chinese = parent_split[len(parent_split) - 1].split(".")
-            curr_version_chinese = overlapElement(parent_split, version_list)
-            if len(curr_version_chinese) == 0:
-                curr_version_chinese = list(version_list[0])
-            legal_doc_name = platform_name[0] + "-" + doc_name_chinese[0] + "-" + doc_name_chinese[1] + "-" + doc_detail_chinese[1] + "-" + curr_version_chinese[0]
-            if legal_doc_name.lower() != separate_file_name.lower():
-                legal_check = False
+            legal_check = legal_name_check(parent_split, version_list, platform_name[0], separate_file_name)
         else:
             # TODO: 进一步检查初始化脚本文件
             legal_doc_name = platform_name[1] + "-" + ""
