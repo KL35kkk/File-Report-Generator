@@ -44,7 +44,7 @@ doc_detail_list = []
 segment_arr = []  # doc名称分界index
 version_list = ["V"]  # "V"用于文档模板一栏
 each_version_dict = {example_prod: ["V"]} # 标记每个产品下的对应版本，用于排查必需文档
-doc_stats = [[], [], []] # 用于统计各组文档完成情况
+doc_stats = [[0,0,0,0], [0,0,0,0], [0,0,0,0]] # 用于统计各组文档完成情况，0：合格，1：格式问题，2：缺失
 # ----------------------------------------------------
 
 wb = xlwt.Workbook(encoding='utf-8')
@@ -184,23 +184,13 @@ for i in range(0, len(version_list)):
     sh.write_merge(2, 2, n + 1, n + len(doc_detail_list), version_list[i], xlwt.easyxf(
         'align: horiz center; pattern: pattern solid, fore_colour 0x16; borders: left thick, right thick, top thick, bottom thick;'))
 
-mark_cell_row = len(product_list) + 5
-mark_cell_column = 3
-for i in range(0, len(styles)):
-    sh.write(mark_cell_row, mark_cell_column, "", styles[i])
-    sh.write(mark_cell_row, mark_cell_column + 1, styles_desc[i])
-    mark_cell_row = mark_cell_row + 2
-
-# mark_cell_row = len(product_list) + 5
-# mark_cell_column = 8
-# overall_res = get_division_list(path)
-# for i in range(0, len(overall_res)):
-#     sh.write(mark_cell_row, mark_cell_column, group_division[i] + ":")
-#     sh.write(mark_cell_row, mark_cell_column + 2, overall_res[i])
-#     mark_cell_column = mark_cell_column + 5
-
 print("---------------文档结构已搭建完成！---------------")
 # ---------------------------开始标记---------------------------------
+
+group_conditions = lambda x: {
+    0 <= x < segment_arr[0]: 0, segment_arr[0] <= x < segment_arr[1]: 1, 
+    segment_arr[1] <= x < segment_arr[2]: 2, segment_arr[2] <= x < segment_arr[3]: 3
+}
 
 # 标记目前强制需要文档
 required_row_init = 3
@@ -209,10 +199,13 @@ for i in range(0, len(product_list)):
         required_col_detail_index = doc_detail_list.index(required_doc[j])
         required_each_versions = each_version_dict.get(product_list[i])
         for version in required_each_versions:
+            # 标记各组所需填文档总数，下面进行删减填充
+            group_index = group_conditions(required_col_detail_index)[True]
+            doc_stats[1][group_index] = doc_stats[1][group_index] + 1
+            # 获取对应表格位置
             version_index = version_list.index(version)
             sh.write(required_row_init, version_index * len(doc_detail_list) + required_col_detail_index + 1, "", style2)
     required_row_init += 1
-
 
 # 从配置获取目录名
 dir = "./ocean_doc"
@@ -224,6 +217,10 @@ col_init = 1  # 对应小目录
 
 prev_dir = ""
 prev_row_num = 0
+
+curr_group_no = 0
+
+myresult = 0
 for parent, dir_names, file_names in os.walk(dir):
     file_names = [f for f in file_names if not f[0] == '.']  # 过滤隐藏文件
     dir_names[:] = [d for d in dir_names if not d[0] == '.']  # 过滤隐藏目录
@@ -251,10 +248,13 @@ for parent, dir_names, file_names in os.walk(dir):
                 continue
             elif parent_split[4] in version_list:
                 ver = version_list.index(parent_split[4]) * len(doc_detail_list)
+                curr_group_no = int(parent_split[5][0:2]) - 1
             else:
                 ver = 0
+                curr_group_no = int(parent_split[3][0:2]) - 1
         else:
             ver = version_list.index(parent_split[3]) * len(doc_detail_list)
+            curr_group_no = int(parent_split[4][0:2]) - 1
 
         doc_type = doc_detail_list.index(parent_split[len(parent_split) - 1])
 
@@ -267,13 +267,34 @@ for parent, dir_names, file_names in os.walk(dir):
         else:
             # TODO: 进一步检查初始化脚本文件
             legal_doc_name = platform_name[1] + "-" + ""
+            
+
+        if parent_split[len(parent_split) - 1] in required_doc:
+            doc_stats[1][curr_group_no] = doc_stats[1][curr_group_no] - 1
 
         if legal_check or parent_split[2] == example_prod:
             sh.write(row_init, ver + doc_type + 1, "", style1) # 文档正常存在
+            doc_stats[0][curr_group_no] = doc_stats[0][curr_group_no] + 1
         else:
             sh.write(row_init, ver + doc_type + 1, "", style3) # 格式有问题
+            doc_stats[2][curr_group_no] = doc_stats[2][curr_group_no] + 1
 
-        # print(parent_split)
+mark_cell_row = len(product_list) + 5
+mark_cell_column = 3
+for i in range(0, len(styles)):
+    sh.write(mark_cell_row, mark_cell_column, "", styles[i])
+    sh.write(mark_cell_row, mark_cell_column + 1, styles_desc[i])
+    mark_cell_row = mark_cell_row + 1
+
+mark_cell_row = len(product_list) + 5
+mark_cell_column = 8
+for i in range(0, len(doc_stats)):
+    for j in range(0, len(doc_stats[0])):
+        sh.write(mark_cell_row, mark_cell_column, group_division[j] + ":")
+        sh.write(mark_cell_row, mark_cell_column + 2, doc_stats[i][j])
+        mark_cell_column = mark_cell_column + 5
+    mark_cell_row = mark_cell_row + 1
+    mark_cell_column = 8
 
 doc_name = "doc_result_chart.xls"
 wb.save(doc_name)

@@ -28,7 +28,6 @@ def get_division_list(dir) :
             division_list[group_index] = division_list[group_index] + 1
 
             if not filled.__contains__(parent):
-                print(parent)
                 filled.append(parent)
             row_init = row_init+1
 
