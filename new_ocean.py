@@ -210,7 +210,8 @@ for i in range(0, len(product_list)):
 # 从配置获取目录名
 dir = "./ocean_doc"
 
-
+legal_doc_parents = []
+error_doc_parents = []
 file_col = 1
 row_init = 2  # 对应大目录
 col_init = 1  # 对应小目录
@@ -223,10 +224,10 @@ curr_group_no = 0
 myresult = 0
 for parent, dir_names, file_names in os.walk(dir):
     file_names = [f for f in file_names if not f[0] == '.']  # 过滤隐藏文件
+    file_names = [f for f in file_names if not ignore_files.__contains__(f)] # 过滤额外文件
     dir_names[:] = [d for d in dir_names if not d[0] == '.']  # 过滤隐藏目录
+    dir_names = list(set(dir_names))
     for file_name in file_names:
-        if file_name in ignore_files:  # 过滤额外文件
-            continue
 
         parent_split = parent.replace("\\", "/").split('/')
 
@@ -272,13 +273,20 @@ for parent, dir_names, file_names in os.walk(dir):
         if parent_split[len(parent_split) - 1] in required_doc:
             doc_stats[1][curr_group_no] = doc_stats[1][curr_group_no] - 1
 
-        if legal_check or parent_split[2] == example_prod:
+        if (legal_check or parent_split[2] == example_prod) and parent not in legal_doc_parents: # 如果文件名合规(或者文档模板)，并且之前还没有符合规则的文件(若有会造成合格文档数量重复累计)
             sh.write(row_init, ver + doc_type + 1, "", style1) # 文档正常存在
             doc_stats[0][curr_group_no] = doc_stats[0][curr_group_no] + 1
-        else:
+            legal_doc_parents.append(parent)
+            if parent in error_doc_parents: # 如先遍历到非常规文件名，从之前错误文件总数减一
+                doc_stats[2][curr_group_no] = doc_stats[2][curr_group_no] - 1
+        elif parent not in legal_doc_parents and parent not in error_doc_parents: # 标记错误文档时略过已经标记的文件夹
             sh.write(row_init, ver + doc_type + 1, "", style3) # 格式有问题
             doc_stats[2][curr_group_no] = doc_stats[2][curr_group_no] + 1
+            error_doc_parents.append(parent)
+        if curr_group_no == 3:
+            print(parent_split)
 
+            
 mark_cell_row = len(product_list) + 5
 mark_cell_column = 3
 for i in range(0, len(styles)):
