@@ -21,7 +21,7 @@
 
 import os
 import re
-from utils import overlapElement
+from utils import get_dir, overlapElement
 from utils import legal_name_check
 from mark_division import get_division_list
 from functools import reduce
@@ -208,7 +208,7 @@ for i in range(0, len(product_list)):
     required_row_init += 1
 
 # 从配置获取目录名
-dir = "./ocean_doc"
+dir = get_dir()
 
 legal_doc_parents = []
 error_doc_parents = []
@@ -283,8 +283,6 @@ for parent, dir_names, file_names in os.walk(dir):
             sh.write(row_init, ver + doc_type + 1, "", style3) # 格式有问题
             doc_stats[2][curr_group_no] = doc_stats[2][curr_group_no] + 1
             error_doc_parents.append(parent)
-        if curr_group_no == 3:
-            print(parent_split)
 
             
 mark_cell_row = len(product_list) + 5
