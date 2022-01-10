@@ -1,5 +1,5 @@
 # py-excel
-Python project to generate .xls/.csv based on product doc directory
+Python project to generate visual .xls/.csv files based on doc directory
 
 ## Requirements
 - Python 3.8.x
