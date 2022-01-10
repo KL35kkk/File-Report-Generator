@@ -19,7 +19,6 @@ def legal_name_check(parent_split, version_list, platform_name, separate_file_na
 def get_dir():
     try:
         with open('dir.txt', 'r') as f:
-            print(f.readline())
             return f.readline()
     except Exception as e:
         print("文件格式有误,或者文件名不对----" + e)
