@@ -21,7 +21,7 @@
 
 import os
 import re
-from utils import get_dir, overlapElement
+from utils import filetype, get_dir, overlapElement
 from utils import legal_name_check
 from mark_division import get_division_list
 from functools import reduce
@@ -36,6 +36,8 @@ from doc_var import ignore_files
 from doc_var import ignore_docs
 from doc_var import example_prod # 暂时作为模板文档名
 from doc_var import required_doc
+from doc_var import group_products
+from doc_var import group_mapper
 
 product_list = []
 
@@ -45,6 +47,7 @@ segment_arr = []  # doc名称分界index
 version_list = ["V"]  # "V"用于文档模板一栏
 each_version_dict = {example_prod: ["V"]} # 标记每个产品下的对应版本，用于排查必需文档
 doc_stats = [[0,0,0,0], [0,0,0,0], [0,0,0,0]] # 用于统计各组文档完成情况，0：合格，1：格式问题，2：缺失
+group_doc_stats = [{}, {}, {}]
 # ----------------------------------------------------
 
 wb = xlwt.Workbook(encoding='utf-8')
@@ -109,6 +112,13 @@ for dir1 in dirs:
                     version_list.append(inner_next_dir)
             each_version_dict.update({(dir1.split('.')[0] + "." + dir2.split('.')[1]): inner_next_dirs})
 version_list = sorted(version_list)
+
+# 初始化各个负责人对应合格、缺陷、缺失文档
+for i in range(0, len(group_doc_stats)):
+    curr_dict_contactor_group = {}
+    for key in group_mapper.keys():
+        curr_dict_contactor_group.update({key : 0})
+    group_doc_stats[i] = curr_dict_contactor_group
 print("---------------已扫描文档结构并记录---------------")
 
 # 创建四个样式----------------------------
@@ -195,6 +205,7 @@ group_conditions = lambda x: {
 # 标记目前强制需要文档
 required_row_init = 3
 for i in range(0, len(product_list)):
+    curr_contactor_no = group_products.get(product_list[i]) # 获取当前产品负责人对应编号
     for j in range(0, len(required_doc)):
         required_col_detail_index = doc_detail_list.index(required_doc[j])
         required_each_versions = each_version_dict.get(product_list[i])
@@ -202,6 +213,8 @@ for i in range(0, len(product_list)):
             # 标记各组所需填文档总数，下面进行删减填充
             group_index = group_conditions(required_col_detail_index)[True]
             doc_stats[1][group_index] = doc_stats[1][group_index] + 1
+            # 标记各个产品负责人
+            group_doc_stats[1][group_products.get(product_list[i])] = group_doc_stats[1][group_products.get(product_list[i])] + 1
             # 获取对应表格位置
             version_index = version_list.index(version)
             sh.write(required_row_init, version_index * len(doc_detail_list) + required_col_detail_index + 1, "", style2)
@@ -270,36 +283,50 @@ for parent, dir_names, file_names in os.walk(dir):
             legal_doc_name = platform_name[1] + "-" + ""
             
 
+        curr_group_contactor = group_products.get(parent_split[2])
         if parent_split[len(parent_split) - 1] in required_doc:
             doc_stats[1][curr_group_no] = doc_stats[1][curr_group_no] - 1
+            group_doc_stats[1][curr_group_contactor] = group_doc_stats[1][curr_group_contactor] - 1
 
         if (legal_check or parent_split[2] == example_prod) and parent not in legal_doc_parents: # 如果文件名合规(或者文档模板)，并且之前还没有符合规则的文件(若有会造成合格文档数量重复累计)
             sh.write(row_init, ver + doc_type + 1, "", style1) # 文档正常存在
             doc_stats[0][curr_group_no] = doc_stats[0][curr_group_no] + 1
+            group_doc_stats[0][curr_group_contactor] = group_doc_stats[0][curr_group_contactor] + 1
             legal_doc_parents.append(parent)
-            if parent in error_doc_parents: # 如先遍历到非常规文件名，从之前错误文件总数减一
+            if parent in error_doc_parents: # 如先前已经遍历到非常规文件名，则从之前错误文件总数减一
                 doc_stats[2][curr_group_no] = doc_stats[2][curr_group_no] - 1
+                group_doc_stats[2][curr_group_contactor] = group_doc_stats[2][curr_group_contactor] - 1
         elif parent not in legal_doc_parents and parent not in error_doc_parents: # 标记错误文档时略过已经标记的文件夹
             sh.write(row_init, ver + doc_type + 1, "", style3) # 格式有问题
             doc_stats[2][curr_group_no] = doc_stats[2][curr_group_no] + 1
+            group_doc_stats[2][curr_group_contactor] = group_doc_stats[2][curr_group_contactor] + 1
             error_doc_parents.append(parent)
 
-            
 mark_cell_row = len(product_list) + 5
 mark_cell_column = 3
 for i in range(0, len(styles)):
     sh.write(mark_cell_row, mark_cell_column, "", styles[i])
     sh.write(mark_cell_row, mark_cell_column + 1, styles_desc[i])
-    mark_cell_row = mark_cell_row + 1
+    mark_cell_row = mark_cell_row + 3
 
 mark_cell_row = len(product_list) + 5
+mark_cell_column = 8
+for i in range(0, len(group_doc_stats)):
+    for key in group_doc_stats[i].keys():
+        sh.write(mark_cell_row, mark_cell_column, group_mapper.get(key) + "：")
+        sh.write(mark_cell_row, mark_cell_column + 3, group_doc_stats[i][key])
+        mark_cell_column = mark_cell_column + 5
+    mark_cell_row = mark_cell_row + 3
+    mark_cell_column = 8
+
+mark_cell_row = len(product_list) + 6
 mark_cell_column = 8
 for i in range(0, len(doc_stats)):
     for j in range(0, len(doc_stats[0])):
         sh.write(mark_cell_row, mark_cell_column, group_division[j] + ":")
         sh.write(mark_cell_row, mark_cell_column + 2, doc_stats[i][j])
         mark_cell_column = mark_cell_column + 5
-    mark_cell_row = mark_cell_row + 1
+    mark_cell_row = mark_cell_row + 3
     mark_cell_column = 8
 
 doc_name = "doc_result_chart.xls"

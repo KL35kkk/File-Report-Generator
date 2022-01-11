@@ -1,4 +1,6 @@
 import re
+import struct
+from doc_var import typeList
 
 def overlapElement(list1, list2):
     return list(set(list1) & set(list2))
@@ -14,6 +16,31 @@ def legal_name_check(parent_split, version_list, platform_name, separate_file_na
     if legal_doc_name.lower() != separate_file_name.lower():
         legal_check = False
     return legal_check
+    
+def bytes2hex(bytes):  
+    num = len(bytes)  
+    hexstr = u""  
+    for i in range(num):  
+        t = u"%x" % bytes[i]  
+        if len(t) % 2:  
+            hexstr += u"0"
+        hexstr += t  
+    return hexstr.upper()  
+    
+def filetype(file):  
+    binfile = open(file, 'rb')
+    type = 'unknown'
+    for hcode in typeList.keys():  
+        num_bytes = len(hcode) / 2 
+        binfile.seek(0) 
+        hbytes = struct.unpack_from("B"*num_bytes, binfile.read(num_bytes))
+        code = bytes2hex(hbytes)  
+        if code == hcode:  
+            type = typeList[hcode]  
+            break
+    binfile.close()  
+    return type
+
 
 # 写个配置文件，通过它获取目录
 def get_dir():
