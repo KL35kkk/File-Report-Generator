@@ -6,6 +6,7 @@ Python project to generate visual .xls/.csv files based on doc directory
 - pip
 
 ## Usage
+- python3 new_ocean.py
 
 ### Install Requirements
 1. git clone https://github.com/KL35kkk/py-excel/
