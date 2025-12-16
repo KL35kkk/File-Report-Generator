@@ -1,1 +1,1 @@
-./ocean_doc
+./my_docs

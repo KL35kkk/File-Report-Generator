@@ -1,0 +1,62 @@
+# 默认配置文件示例
+# 请根据你的项目需求修改此配置
+
+project:
+  name: "my_project"
+  doc_path: "./docs"
+  template_product: "00.文档模板"
+
+naming:
+  platform_names: ["PLATFORM", "platform"]  # 平台名称列表
+  version_prefix: "V"  # 版本号前缀
+  pattern: "{platform}-{number}-{product}-{type}-{version}"  # 命名模式
+
+validation:
+  required_docs:
+    - "03.产品白皮书"
+    - "05.用户操作手册"
+    - "01.代码库清单"
+    - "03.概要设计"
+    - "05.数据库设计"
+    - "01.安装操作说明"
+    - "02.部署初始化脚本"
+  ignore_files:
+    - ".git"
+    - ".gitkeep"
+    - ".gitignore"
+    - "README.md"
+  ignore_docs:
+    - "XX.其他文档"
+
+groups:
+  divisions:
+    - "产品"
+    - "开发"
+    - "测试"
+    - "运维"
+  products:
+    "00.文档模板": 1
+    "01.示例产品A": 1
+    "02.示例产品B": 2
+    "03.示例产品C": 3
+  mapper:
+    1: "A"
+    2: "B"
+    3: "C"
+    4: "D"
+    5: "E"
+    6: "F"
+    7: "G"
+    8: "H"
+    9: "I"
+    10: "J"
+
+output:
+  excel:
+    sheet_name: "doc_report"
+    output_path: "report.xls"
+    styles:
+      valid: "green"
+      invalid: "yellow"
+      missing: "red"
+

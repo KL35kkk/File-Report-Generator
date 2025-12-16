@@ -1,12 +1,9 @@
-pip~=21.3.1
-setuptools~=60.5.0
-pipreqs==0.4.11
-numpy>=1.22
-oauthlib==3.1.0
-openpyxl==3.0.9
-pandas==1.3.4
-simplejson==3.16.0
-virtualenv==20.0.17
-xlrd==1.2.0
+# 核心依赖
 xlwt==1.3.0
-xlutils~=2.0.0
+xlrd==1.2.0
+PyYAML>=5.4.1
+
+# 可选依赖（用于扩展功能）
+openpyxl>=3.0.9
+pandas>=1.3.4
+numpy>=1.22

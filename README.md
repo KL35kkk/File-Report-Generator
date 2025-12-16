@@ -1,37 +1,59 @@
-# py-excel
-Python project to generate visual .xls/.csv files based on doc directory
+# File Report Generator
 
-## Requirements
-- Python 3.8.x
-- pip
+A universal document report generator that scans document directories, validates naming conventions, and generates visual Excel reports.
 
-### Install Requirements
-1. git clone https://github.com/KL35kkk/py-excel/
+## Features
 
-2. pip install -r requirements.txt
+- Directory scanning
+- Document validation
+- Excel report generation
+- Fully configurable via YAML
+- Extensible architecture
 
-3. put doc directory inside py-excel folder
+## Quick Start
 
-### Running
-cd venv & source ./bin/activate
+### Install
 
-python3 new_ocean.py
+```bash
+pip install -r requirements.txt
+```
 
-## Doc Requirement
-For saving standardized product documentation
+### Configure
 
-### Directory Structure
+```bash
+cp config/default.yaml config/my_project.yaml
+# Edit config/my_project.yaml
+```
 
-Product -> (Sub-Product) -> Version -> Doc Type -> Specific Doc -> Files
+### Run
 
-### Doc Name
+```bash
+python cli.py --config config/my_project.yaml
+```
 
-Product-Product Number-Product Name-Doc Type-Version-Suffix (separated by hyphen)
+## Configuration
 
-> ex1：OCEAN-05-DATA_INTEGRATION_PLATFORM-PRODUCT_PROTOTYPE-V1.0.docx
->
-> ex2：OCEAN-09-DATA_VISUALIZATION_PLATFORM-USER_OPERATION_REFERENCE-V1.0.docx
->
-> ex3：OCEAN-09-TAG_PIC_PLATFORM-DEV_PLAN-V1.0.docx
->
-> ex4：ocean-10-tag-manager_sge_v1.0.sql
+See `config/default.yaml` for examples.
+
+## Directory Structure
+
+```
+docs/
+├── 00.doc_template/          # Template (optional)
+├── 01.ProductA/
+│   ├── V1.0/
+│   └── V2.0/
+└── 02.ProductB/
+```
+
+## Naming Convention
+
+Format: `{platform}-{number}-{product}-{type}-{version}.docx`
+
+Example: `PLATFORM-01-ProductA-ProductSpec-V1.0.docx`
+
+## Report Colors
+
+- 🟢 Green - Valid documents
+- 🟡 Yellow - Format errors
+- 🔴 Red - Missing documents
