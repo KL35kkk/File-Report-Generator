@@ -1,4 +1,4 @@
-# File Report Generator
+# Document Report Generator
 
 A universal document report generator that scans document directories, validates naming conventions, and generates visual Excel reports.
 
